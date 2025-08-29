@@ -18,3 +18,28 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# Event Schemas
+from typing import Optional
+from datetime import date, time
+
+class EventCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    date: date
+    time: time
+    location: str
+
+class EventResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    date: date
+    time: time
+    location: str
+    organizer: UserOut
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

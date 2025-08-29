@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -22,11 +23,13 @@ class Event(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    location = Column(String, nullable=True)
-    start_time = Column(DateTime(timezone=True), nullable=False)
-    end_time = Column(DateTime(timezone=True), nullable=True)
+    date = Column(DateTime(timezone=False), nullable=False)
+    time = Column(String, nullable=False)  # Store as string (HH:MM:SS)
+    location = Column(String, nullable=False)
+    organizer_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    organizer_id = Column(Integer, nullable=False)  # FK to User.id (add ForeignKey if you want strict FK)
+
+    organizer = relationship('User', backref='events')
 
 
 class RSVP(Base):
