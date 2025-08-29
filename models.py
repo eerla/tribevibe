@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
@@ -17,6 +17,8 @@ class User(Base):
     is_active = Column(Integer, default=1)  # 1=True, 0=False
     last_login = Column(DateTime(timezone=True), nullable=True)
 
+    rsvps = relationship('RSVP', back_populates='user')
+
 
 class Event(Base):
     __tablename__ = "events"
@@ -30,12 +32,17 @@ class Event(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     organizer = relationship('User', backref='events')
+    rsvps = relationship('RSVP', back_populates='event')
+
 
 
 class RSVP(Base):
     __tablename__ = "rsvps"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, nullable=False)  # FK to User.id
-    event_id = Column(Integer, nullable=False)  # FK to Event.id
-    status = Column(String, default="going")  # going, interested, not_going
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    event_id = Column(Integer, ForeignKey('events.id'), nullable=False)
+    status = Column(Enum('yes', 'no', 'maybe', name='rsvp_status'), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship('User', back_populates='rsvps')
+    event = relationship('Event', back_populates='rsvps')
