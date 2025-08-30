@@ -53,7 +53,7 @@ class EventResponse(BaseModel):
     organizer: UserOut
     created_at: datetime
     rsvp_count: int = 0
-    rsvp_status: str = None
+    rsvp_status: Optional[str] = None
 
     class Config:
         from_attributes = True
