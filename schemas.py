@@ -50,10 +50,12 @@ class EventResponse(BaseModel):
     date: date
     time: time
     location: str
+
     organizer: UserOut
     created_at: datetime
+    banner_url: Optional[str] = None
     rsvp_count: int = 0
-    rsvp_status: str = None
+    rsvp_status: Optional[str] = None
 
     class Config:
         from_attributes = True
