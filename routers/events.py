@@ -145,7 +145,8 @@ def my_registrations(db: Session = Depends(get_db), current_user: models.User = 
             time=datetime.strptime(e.time, "%H:%M:%S").time(),
             location=e.location,
             organizer=schemas.UserOut.from_orm(e.organizer),
-            created_at=e.created_at
+            created_at=e.created_at,
+            banner_url=e.banner_url
         ) for e in events
     ]
     
@@ -171,7 +172,8 @@ def create_event(event: schemas.EventCreate, db: Session = Depends(get_db), curr
         time=datetime.strptime(db_event.time, "%H:%M:%S").time(),
         location=db_event.location,
         organizer=schemas.UserOut.from_orm(db_event.organizer),
-        created_at=db_event.created_at
+        created_at=db_event.created_at,
+        banner_url=db_event.banner_url
     )
 
 @router.get("/", response_model=List[schemas.EventResponse])
@@ -186,7 +188,8 @@ def list_events(db: Session = Depends(get_db)):
             time=datetime.strptime(e.time, "%H:%M:%S").time(),
             location=e.location,
             organizer=schemas.UserOut.from_orm(e.organizer),
-            created_at=e.created_at
+            created_at=e.created_at,
+            banner_url=e.banner_url
         ) for e in events
     ]
     
@@ -208,6 +211,7 @@ def get_event(event_id: int, db: Session = Depends(get_db), current_user: models
         location=event.location,
         organizer=schemas.UserOut.from_orm(event.organizer),
         created_at=event.created_at,
+        banner_url=event.banner_url,
         rsvp_count=rsvp_count,
         rsvp_status=rsvp_status
     )
