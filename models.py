@@ -29,6 +29,8 @@ class Event(Base):
     time = Column(String, nullable=False)  # Store as string (HH:MM:SS)
     location = Column(String, nullable=False)
     organizer_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+
+    banner_url = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     organizer = relationship('User', backref='events')
