@@ -4,44 +4,45 @@ from fastapi import File, UploadFile
 import os
 import time
 from typing import Optional
-try:
-    import boto3
-    from botocore.exceptions import NoCredentialsError
-except ImportError:
-    boto3 = None
-    NoCredentialsError = Exception
 
-# Helper to save banner to S3 or local
+from supabase import create_client
+import boto3
+
+session = boto3.session.Session()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
+supabase = None
+if SUPABASE_URL and SUPABASE_SERVICE_KEY:
+    supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
+# Helper to save banner to Supabase Storage or local
 def save_banner(file, event_id: int) -> Optional[str]:
     """
-    Saves a file to S3 if credentials are set, else to local uploads/ folder.
+    Saves a file to Supabase Storage bucket 'banners' if configured, else to local uploads/ folder.
     Returns the public URL or local path.
     """
-    # Generate unique filename
     timestamp = int(time.time())
     ext = os.path.splitext(file.filename)[-1]
     filename = f"event_{event_id}_{timestamp}{ext}"
-
-    # Try S3 if boto3 and credentials are available
-    s3_bucket = os.getenv("S3_BUCKET")
-    s3_key = os.getenv("AWS_ACCESS_KEY_ID")
-    s3_secret = os.getenv("AWS_SECRET_ACCESS_KEY")
-    s3_region = os.getenv("AWS_REGION", "us-east-1")
-    if boto3 and s3_bucket and s3_key and s3_secret:
-        try:
-            s3 = boto3.client(
-                's3',
-                aws_access_key_id=s3_key,
-                aws_secret_access_key=s3_secret,
-                region_name=s3_region
-            )
-            s3.upload_fileobj(file.file, s3_bucket, filename, ExtraArgs={"ACL": "public-read"})
-            url = f"https://{s3_bucket}.s3.{s3_region}.amazonaws.com/{filename}"
-            return url
-        except Exception as e:
-            print(f"S3 upload failed: {e}")
+    bucket_name = "banners"
+    if supabase:
+        file.file.seek(0)
+        content = file.file.read()
+        res = supabase.storage.from_(bucket_name).upload(filename, content, {"content-type": file.content_type})
+        if res.get("error"):
+            print(f"Supabase upload failed: {res['error']['message']}")
             file.file.seek(0)  # Reset file pointer for local save
-
+        else:
+            public_url = supabase.storage.from_(bucket_name).get_public_url(filename)
+            return public_url['publicURL'] if 'publicURL' in public_url else None
+    # Fallback: save to local uploads/
+    upload_dir = os.path.join(os.getcwd(), "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+    local_path = os.path.join(upload_dir, filename)
+    with open(local_path, "wb") as out_file:
+        out_file.write(file.file.read())
+    return local_path
     # Fallback: save to local uploads/
     upload_dir = os.path.join(os.getcwd(), "uploads")
     os.makedirs(upload_dir, exist_ok=True)
