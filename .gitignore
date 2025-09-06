@@ -79,3 +79,4 @@ dmypy.json
 Thumbs.db
 # Ignore Python bytecode cache
 __pycache__/
+*.pyc
