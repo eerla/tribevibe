@@ -1,3 +1,6 @@
+from sqlalchemy import Table
+# Association table for group members
+
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -18,7 +21,25 @@ class User(Base):
     last_login = Column(DateTime(timezone=True), nullable=True)
 
     rsvps = relationship('RSVP', back_populates='user')
+class GroupMember(Base):
+    __tablename__ = "group_members"
+    id = Column(Integer, primary_key=True, index=True)
+    group_id = Column(Integer, ForeignKey('groups.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    joined_at = Column(DateTime(timezone=True), server_default=func.now())
 
+    group = relationship('Group', backref='memberships')
+    user = relationship('User', backref='group_memberships')
+class Group(Base):
+    __tablename__ = "groups"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+    description = Column(String, nullable=True)
+    owner_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    avatar_url = Column(String, nullable=True)
+
+    owner = relationship('User', backref='groups')
 
 class Event(Base):
     __tablename__ = "events"

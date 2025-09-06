@@ -57,7 +57,7 @@ Pipfile.lock
 
 # poetry
 poetry.lock
-
+__pycache__/
 # mypy
 .mypy_cache/
 .dmypy.json

@@ -44,12 +44,12 @@ def save_banner(file, event_id: int) -> Optional[str]:
         out_file.write(file.file.read())
     return local_path
     # Fallback: save to local uploads/
-    upload_dir = os.path.join(os.getcwd(), "uploads")
-    os.makedirs(upload_dir, exist_ok=True)
-    local_path = os.path.join(upload_dir, filename)
-    with open(local_path, "wb") as out_file:
-        out_file.write(file.file.read())
-    return local_path
+    # upload_dir = os.path.join(os.getcwd(), "uploads")
+    # os.makedirs(upload_dir, exist_ok=True)
+    # local_path = os.path.join(upload_dir, filename)
+    # with open(local_path, "wb") as out_file:
+    #     out_file.write(file.file.read())
+    # return local_path
 
 
 # RSVP endpoint: POST /events/{event_id}/rsvp
