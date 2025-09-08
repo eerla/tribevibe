@@ -208,3 +208,4 @@ The API returns appropriate HTTP status codes and error messages:
 - `500 Internal Server Error`: Server error
 
 Error responses include a `detail` field with a description of the error.
+

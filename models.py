@@ -49,6 +49,7 @@ class Event(Base):
     date = Column(DateTime(timezone=False), nullable=False)
     time = Column(String, nullable=False)  # Store as string (HH:MM:SS)
     location = Column(String, nullable=False)
+    category = Column(String, nullable=True)  # Event category (e.g., "Technology", "Sports", "Music", etc.)
     organizer_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     banner_url = Column(String, nullable=True)

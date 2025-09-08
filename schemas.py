@@ -4,7 +4,7 @@ from datetime import date, time
 
 
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 class GroupMemberCreate(BaseModel):
     group_id: int
@@ -68,6 +68,15 @@ class EventCreate(BaseModel):
     date: date
     time: time
     location: str
+    category: Optional[str] = None
+
+class EventUpdate(BaseModel):
+    title: Optional[str] = Field(default=None, description="Event title")
+    description: Optional[str] = Field(default=None, description="Event description")
+    date: Optional[str] = Field(default=None, description="Event date (YYYY-MM-DD format)")
+    time: Optional[str] = Field(default=None, description="Event time (HH:MM:SS or ISO format)")
+    location: Optional[str] = Field(default=None, description="Event location")
+    category: Optional[str] = Field(default=None, description="Event category")
 
 class EventResponse(BaseModel):
     id: int
@@ -76,6 +85,7 @@ class EventResponse(BaseModel):
     date: date
     time: time
     location: str
+    category: Optional[str] = None
 
     organizer: UserOut
     created_at: datetime
